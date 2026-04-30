@@ -10,9 +10,7 @@ const AuthContext = createContext()
 export default function AuthProvider({children}){
     const[loading,setloading] = useState(false)
     const[user,setUser] = useState(null)
-     // check initial contidion if a user is logged is not?
-     const param = new URLSearchParams(window.location.search)//see if user is in special situation
-     const hasTokenHash = param.get('token_hash')//get the token form supabasse auth
+     // check initial contidion if a user is logged is not?  
      const [verifyiing,setverifying] = useState(false)
      const[authError,setautherror] = useState(null)
      const[authSuccess,setauthsuccess] = useState(false)
@@ -22,6 +20,7 @@ export default function AuthProvider({children}){
             const type = params.get('type')
             if(token_Hash){
                 //verify the token
+                setverifying(true)
                 supabaseClient.auth
                 .verifyOtp({token_hash: token_Hash, type: type || 'email'})
                 .then(({error})=>{
@@ -33,6 +32,7 @@ export default function AuthProvider({children}){
                         //now clear params
                         window.history.replaceState({}, document.title, '/')
                     }
+                setauthsuccess(false)
                 setverifying(false)
                 })
             }
@@ -46,12 +46,12 @@ export default function AuthProvider({children}){
 
     return () => subscription.unsubscribe()
 }, [])
-const handleLogin = async (e) => {
+const handleLogin = async (e,email) => {
     e.preventDefault()
     setloading(true)
     const {error} = await supabaseClient.auth.signInWithOtp({email
         ,options:{
-            emailRedirectTo: window.location.origin,}
+            emailRedirectTo: window.location.origin + "/verify",}
         })
     if(error){
         alert(error.error_description || error.message)
@@ -61,9 +61,11 @@ const handleLogin = async (e) => {
 const handleLogout = async () => {
     await supabaseClient.auth.signOut()
     setUser(null)
+    setauthsuccess(false)
+    setverifying(false)
 }
 return(
-    <AuthContext.Provider value={{user,loading,handleLogin,handleLogout}}>
+    <AuthContext.Provider value={{user,loading,handleLogin,handleLogout,verifyiing,authError,authSuccess}}>
 {children}</AuthContext.Provider>
 )
 }
