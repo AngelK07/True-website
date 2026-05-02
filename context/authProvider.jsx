@@ -15,30 +15,11 @@ export default function AuthProvider({children}){
      const[authError,setautherror] = useState(null)
      const[authSuccess,setauthsuccess] = useState(false)
         useEffect(()=>{
-            const params = new URLSearchParams(window.location.search)
-            const token_Hash = params.get('token_hash')
-            const type = params.get('type')
-            if(token_Hash){
-                //verify the token
-                setverifying(true)
-                supabaseClient.auth
-                .verifyOtp({token_hash: token_Hash, type: type || 'email'})
-                .then(({error})=>{
-                    if(error){
-                        setautherror(error.message)
-                    }
-                    else{
-                        setauthsuccess(true)
-                        //now clear params
-                        window.history.replaceState({}, document.title, '/')
-                    }
-                setauthsuccess(false)
-                setverifying(false)
-                })
-            }
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
         if (session) {
             setUser(session.user)
+            setverifying(false)
+            setauthsuccess(true)
         } else {
             setUser(null)
         }

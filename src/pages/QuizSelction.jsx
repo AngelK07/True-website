@@ -1,13 +1,20 @@
-import React,{useEffect} from "react";
+import React,{useEffect,useState} from "react";
 import { useNavigate } from "react-router-dom";
 export default function QuizSelection(){
-    const Subject = document.getElementById('subject_input').value;
-    const Chapter = document.getElementById('chapter_input').value;
-    const Difficulty = document.getElementById('difficulty_input').value;
+    const [subject, setSubject] = useState('')
+    const [chapter, setChapter] = useState('')
+    const [difficulty, setDifficulty] = useState('')
+    const navigate = useNavigate()
+
+    function handleSubmit(e) {
+        e.preventDefault()
+        // will use these values to load quiz later
+        console.log(subject, chapter, difficulty)
+    }
     return(
         <div>
             <h1>Quiz Selection</h1>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <label htmlFor="subject_input">Subject:</label>
                 <input type="text" id="subject_input" name="subject_input" required />
                 <label htmlFor="chapter_input">Chapter:</label>

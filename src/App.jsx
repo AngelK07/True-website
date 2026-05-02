@@ -5,6 +5,7 @@ import AuthProvider from '../context/authProvider'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Verify from '../context/verify'
 import QuizSelection from './pages/QuizSelction'
+import AfterLogin from './pages/afterLogin'
 function App() {
   return (
     <AuthProvider>
