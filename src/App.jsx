@@ -7,7 +7,7 @@ import Verify from '../context/verify'
 import QuizSelection from './pages/QuizSelction'
 function App() {
   return (
-    <AuthProvider>s
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
         <Route path="/" element={<Navigate to="/Login" />} />
