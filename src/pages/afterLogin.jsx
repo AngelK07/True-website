@@ -8,7 +8,9 @@ export default function AfterLogin(){
             <p>You are successfully logged in.</p>
             <br/>
             <p>Click the logout button to end your session.</p>
-            <button onClick={handleLogout}>Logout</button>
+            <button onClick={()=>window.location.href="/Login"
+
+            }>Logout</button>
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import React from "react"
 import { Navigate } from "react-router-dom"
 import { useAuth } from "../context/authProvider"
+import QuizSelection from "../src/pages/QuizSelction"
 export default function Verify(){
     const {verifyiing,authError,authSuccess} = useAuth()
     if(verifyiing){
@@ -11,7 +12,7 @@ export default function Verify(){
     }
     if(authSuccess){
         return <div>
-                <Navigate to="/after-login" />
+                <Navigate to="/pages/QuizSelection" />
                 </div>
     }
     return <div>
