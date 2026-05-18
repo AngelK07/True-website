@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import supabaseClient from "../../API/supabase";
+import logo from "../assets/logo.png";
+import '../Css/Quiz.css';
 
 const TimerDisplay = ({ timeLeft, setTimeLeft, onTimeUp }) => {
   const timerRef = useRef(null);
@@ -26,37 +28,20 @@ const TimerDisplay = ({ timeLeft, setTimeLeft, onTimeUp }) => {
   };
 
   return (
-    <div style={{ fontWeight: 'bold', color: timeLeft < 60 ? 'red' : 'black' }}>
-      Time Remaining: {formatTimer(timeLeft)}
+    <div className={`qz-timer ${timeLeft < 60 ? 'urgent' : ''}`}>
+      {formatTimer(timeLeft)}
     </div>
   );
 };
 
-// Palette component
-const QuestionPalette = ({ total, statuses, current, onJump, isOpen, onClose }) => {
-  const colorMap = {
-    not_visited: '#9ca3af',  // grey
-    seen: '#ffffff',          // white
-    answered: '#22c55e',      // green
-    skipped: '#eab308',       // yellow
-  };
-
+const QuestionPalette = ({ statuses, current, onJump, isOpen, onClose }) => {
   const grid = (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '16px' }}>
+    <div className="qz-palette-grid">
       {statuses.map((status, i) => (
         <button
           key={i}
           onClick={() => { onJump(i); onClose && onClose(); }}
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '6px',
-            border: i === current ? '2px solid #3b82f6' : '1px solid #ccc',
-            background: colorMap[status],
-            fontWeight: i === current ? 'bold' : 'normal',
-            cursor: 'pointer',
-            fontSize: '13px',
-          }}
+          className={`qz-palette-num ${status} ${i === current ? 'current' : ''}`}
         >
           {i + 1}
         </button>
@@ -64,33 +49,24 @@ const QuestionPalette = ({ total, statuses, current, onJump, isOpen, onClose }) 
     </div>
   );
 
-  // Desktop sidebar
   const sidebar = (
-    <div style={{
-      position: 'fixed', top: 0, right: 0,
-      width: '220px', height: '100vh',
-      background: '#f9fafb', borderLeft: '1px solid #e5e7eb',
-      overflowY: 'auto', zIndex: 100,
-      display: window.innerWidth >= 768 ? 'block' : 'none'
-    }}>
-      <p style={{ padding: '12px 16px', fontWeight: 'bold', borderBottom: '1px solid #e5e7eb' }}>
-        Question Palette
-      </p>
+    <div className="qz-palette-sidebar" style={{ display: window.innerWidth >= 768 ? 'block' : 'none' }}>
+      <div className="qz-palette-header">Question Palette</div>
+      <div className="qz-legend" style={{ padding: '10px 16px 0' }}>
+        <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#9ca3af' }}></div>Not visited</div>
+        <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#fff', border: '1px solid #ccc' }}></div>Seen</div>
+        <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#22c55e' }}></div>Answered</div>
+        <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#eab308' }}></div>Skipped</div>
+      </div>
       {grid}
     </div>
   );
 
-  // Mobile drawer
   const drawer = isOpen && (
-    <div style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0,
-      background: '#fff', borderTop: '2px solid #e5e7eb',
-      zIndex: 200, maxHeight: '60vh', overflowY: 'auto',
-      display: window.innerWidth < 768 ? 'block' : 'none'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid #eee' }}>
-        <span style={{ fontWeight: 'bold' }}>Question Palette</span>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✕</button>
+    <div className="qz-drawer" style={{ display: window.innerWidth < 768 ? 'block' : 'none' }}>
+      <div className="qz-drawer-header">
+        <span>Question Palette</span>
+        <button className="qz-drawer-close" onClick={onClose}>✕</button>
       </div>
       {grid}
     </div>
@@ -112,23 +88,18 @@ export default function QuizLogic() {
   const [error, setError] = useState(false);
   const [timeLeft, setTimeLeft] = useState(2700);
   const [quizStarted, setQuizStarted] = useState(false);
-
-  // Palette state — inside the component, fixed
   const [questionStatuses, setQuestionStatuses] = useState(Array(50).fill('not_visited'));
   const [paletteOpen, setPaletteOpen] = useState(false);
 
-  // Update status helper
   const updateStatus = (index, status) => {
     setQuestionStatuses(prev => {
       const updated = [...prev];
-      // Don't downgrade answered to seen
       if (updated[index] === 'answered' && status === 'seen') return updated;
       updated[index] = status;
       return updated;
     });
   };
 
-  // When current question changes, mark as seen if not_visited
   useEffect(() => {
     if (questionStatuses[current] === 'not_visited') {
       updateStatus(current, 'seen');
@@ -147,16 +118,13 @@ export default function QuizLogic() {
   };
 
   const handleNext = () => {
-    // If moving away without answering, mark as skipped
     if (!answers[question[current].mcq_id] && questionStatuses[current] !== 'answered') {
       updateStatus(current, 'skipped');
     }
     setCurrent(c => c + 1);
   };
 
-  const handlePrev = () => {
-    setCurrent(c => c - 1);
-  };
+  const handlePrev = () => setCurrent(c => c - 1);
 
   function handleSubmit() {
     setSubmitted(true);
@@ -167,8 +135,8 @@ export default function QuizLogic() {
         answers: answers,
         timeTaken: 2700 - timeLeft,
         subject, chapter, section
-    }
-  });
+      }
+    });
   }
 
   async function LoadQuestions() {
@@ -179,8 +147,6 @@ export default function QuizLogic() {
       p_section: section,
       p_limit: 50
     });
-      console.log("data:", data);   // is it null? empty array? actual data?
-  console.log("error:", error);
 
     if (error) {
       setError(true);
@@ -197,67 +163,90 @@ export default function QuizLogic() {
     setLoading(false);
   }
 
-  useEffect(() => {
-    LoadQuestions();
-  }, []);
+  useEffect(() => { LoadQuestions(); }, []);
+
+  const progress = question.length > 0 ? Math.round((current / question.length) * 100) : 0;
+  const optionLabels = ['A', 'B', 'C', 'D'];
 
   return (
-    <div style={{ marginRight: '230px' }}> {/* offset for sidebar */}
-      {loading && <p>Loading Questions...</p>}
+    <div className="qz-wrap">
 
-      {quizStarted && !submitted && (
-        <TimerDisplay timeLeft={timeLeft} setTimeLeft={setTimeLeft} onTimeUp={handleSubmit} />
-      )}
-
-      {!loading && !error && question.length > 0 && (
-        <div>
-          <h3>Question {current + 1}</h3>
-          <p>{question[current]?.Questions}</p>
-
-          {question[current].options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => handleAnswer(opt)}
-              style={{
-                display: 'block',
-                margin: '5px 0',
-                background: answers[question[current].mcq_id] === opt ? 'lightblue' : 'white'
-              }}
-            >
-              {opt}
-            </button>
-          ))}
-
-          <div style={{ marginTop: '20px' }}>
-            <button onClick={handlePrev} disabled={current === 0}>Prev</button>
-            <button onClick={handleNext} disabled={current === question.length - 1}>Next</button>
-            {!submitted && (
-              <button onClick={handleSubmit} style={{ marginLeft: '10px', background: 'orange' }}>
-                Submit Quiz
-              </button>
-            )}
+      {/* Header */}
+      <div className="qz-header">
+        <div className="qz-header-left">
+          <img src={logo} alt="HCM" className="qz-logo" />
+          <div>
+            <div className="qz-logo-name">HCM</div>
+            <div className="qz-subject">{subject}{chapter ? ` — ${chapter}` : ''}</div>
           </div>
-            
+        </div>
+        {quizStarted && !submitted && (
+          <TimerDisplay timeLeft={timeLeft} setTimeLeft={setTimeLeft} onTimeUp={handleSubmit} />
+        )}
+      </div>
+
+      {/* Progress */}
+      {question.length > 0 && (
+        <div className="qz-progress-wrap">
+          <div className="qz-progress-info">
+            <span>Question {current + 1} of {question.length}</span>
+            <span>{progress}% complete</span>
+          </div>
+          <div className="qz-progress-bar">
+            <div className="qz-progress-fill" style={{ width: `${progress}%` }}></div>
+          </div>
         </div>
       )}
 
-      {/* Mobile open button */}
-      <button
-        onClick={() => setPaletteOpen(true)}
-        style={{
-          position: 'fixed', bottom: '20px', right: '20px',
-          background: '#3b82f6', color: '#fff',
-          border: 'none', borderRadius: '50px',
-          padding: '10px 18px', cursor: 'pointer',
-          display: window.innerWidth < 768 ? 'block' : 'none',
-          zIndex: 150
-        }}
-      >
-        Questions
-      </button>
+      {/* Content */}
+      <div className="qz-content">
+
+        {loading && (
+          <div className="qz-loading">
+            <div className="qz-spinner"></div>
+            <span>Loading questions...</span>
+          </div>
+        )}
+
+        {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '40px' }}>Failed to load questions. Please go back and try again.</p>}
+
+        {!loading && !error && question.length > 0 && (
+          <div className="qz-card">
+            <div className="qz-qnum">Question {current + 1}</div>
+            <div className="qz-qtext">{question[current]?.Questions}</div>
+            <div className="qz-divider"></div>
+
+            {question[current].options.map((opt, i) => (
+              <button
+                key={i}
+                className={`qz-opt ${answers[question[current].mcq_id] === opt ? 'selected' : ''}`}
+                onClick={() => handleAnswer(opt)}
+              >
+                <span className="qz-opt-label">{optionLabels[i]}</span>
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Legend on mobile */}
+        <div className="qz-legend" style={{ display: window.innerWidth < 768 ? 'flex' : 'none' }}>
+          <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#9ca3af' }}></div>Not visited</div>
+          <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#fff', border: '1px solid #ccc' }}></div>Seen</div>
+          <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#22c55e' }}></div>Answered</div>
+          <div className="qz-legend-item"><div className="qz-legend-dot" style={{ background: '#eab308' }}></div>Skipped</div>
+        </div>
+      </div>
+
+      {/* Fixed Bottom Nav */}
+      <div className="qz-bottom">
+        <button className="qz-nav-btn" onClick={handlePrev} disabled={current === 0}>Prev</button>
+        <button className="qz-palette-btn" onClick={() => setPaletteOpen(true)}>Questions</button>
+        <button className="qz-nav-btn" onClick={handleNext} disabled={current === question.length - 1}>Next</button>
+        {!submitted && <button className="qz-submit-btn" onClick={handleSubmit}>Submit</button>}
+      </div>
 
       <QuestionPalette
-        total={question.length}
         statuses={questionStatuses}
         current={current}
         onJump={jumpTo}
