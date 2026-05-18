@@ -6,6 +6,7 @@ import ProtectedRoute from '../components/ProtectedRoute'
 import Verify from '../context/verify'
 import QuizSelection from './pages/QuizSelction'
 import QuizLogic from './pages/Quiz'
+import Result from './pages/result'
 function App() {
   return (
     <AuthProvider>
@@ -22,7 +23,12 @@ function App() {
           <Route path="/Quiz" element={
             <ProtectedRoute>
               <QuizLogic/>
-            </ProtectedRoute>
+              </ProtectedRoute>
+          }/>
+          <Route path="/result" element={
+            <ProtectedRoute>
+              <Result/>
+              </ProtectedRoute>
           }/>
         </Routes>
       </BrowserRouter>
