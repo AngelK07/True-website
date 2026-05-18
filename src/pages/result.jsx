@@ -1,8 +1,10 @@
-import React, { useState,useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import supabaseClient from "../../API/supabase";
+import logo from "../assets/logo.png";
+import '../Css/result.css';
 
- let attemptSaved = (false);
+let attemptSaved = false;
 
 export default function Result() {
   const location = useLocation();
@@ -16,11 +18,10 @@ export default function Result() {
     return null;
   }
 
-  // Categorize
   const correct = [];
   const wrong = [];
   const skipped = [];
-  let score = 0; // Assuming 1 mark per question
+  let score = 0;
 
   questions.forEach((q, i) => {
     const userAnswer = answers[q.mcq_id];
@@ -31,35 +32,33 @@ export default function Result() {
       score += 1;
     } else {
       wrong.push({ ...q, index: i, userAnswer });
-      score -= 0.25; // Negative marking for wrong answers
+      score -= 0.25;
     }
   });
 
   useEffect(() => {
-  if (attemptSaved) return;
-  attemptSaved = true;
+    if (attemptSaved) return;
+    attemptSaved = true;
 
-  async function saveAttempt() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabaseClient
-      .from('quiz_attempts')
-      .insert({
-        student_id: user.id,
-        Subject: subject,
-        Chapter: chapter,
-        Section: section,
-        answers: answers,
-        score: score,
-        time_taken: timeTaken,
-        attempted_at: new Date().toISOString()
-      });
-
-    if (error) console.log("Save failed:", error);
-  }
-  saveAttempt();
-}, []);
+    async function saveAttempt() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) return;
+      const { error } = await supabaseClient
+        .from('quiz_attempts')
+        .insert({
+          student_id: user.id,
+          Subject: subject,
+          Chapter: chapter,
+          Section: section,
+          answers: answers,
+          score: score,
+          time_taken: timeTaken,
+          attempted_at: new Date().toISOString()
+        });
+      if (error) console.log("Save failed:", error);
+    }
+    saveAttempt();
+  }, []);
 
   const formatTime = (s) => {
     const mins = Math.floor(s / 60);
@@ -68,136 +67,141 @@ export default function Result() {
   };
 
   const QuestionCard = ({ q, type }) => (
-    <div style={{
-      border: '1px solid #e5e7eb',
-      borderRadius: '8px',
-      padding: '16px',
-      marginBottom: '12px',
-      background: '#fff'
-    }}>
-      <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-        Q{q.index + 1}. {q.Questions}
-      </p>
+    <div className="rs-qcard">
+      <div className="rs-qnum">Q{q.index + 1}</div>
+      <div className="rs-qtext">{q.Questions}</div>
+      <div className="rs-divider"></div>
 
-      {/* Wrong — show user answer in red, correct in green */}
       {type === 'wrong' && (
         <>
-          <p style={{ color: 'red' }}>✗ Your answer: {q.userAnswer}</p>
-          <p style={{ color: 'green' }}>✓ Correct: {q.correct_answer}</p>
+          <div className="rs-answer-row wrong-ans">
+            <span className="rs-answer-icon">✗</span>
+            <span>Your answer: {q.userAnswer}</span>
+          </div>
+          <div className="rs-answer-row correct-ans">
+            <span className="rs-answer-icon">✓</span>
+            <span>Correct: {q.correct_answer}</span>
+          </div>
         </>
       )}
 
-      {/* Skipped — just show correct */}
       {type === 'skipped' && (
-        <p style={{ color: 'green' }}>✓ Correct: {q.correct_answer}</p>
+        <div className="rs-answer-row correct-ans">
+          <span className="rs-answer-icon">✓</span>
+          <span>Correct answer: {q.correct_answer}</span>
+        </div>
       )}
 
-      {/* Correct — show correct answer */}
       {type === 'correct' && (
-        <p style={{ color: 'green' }}>✓ {q.correct_answer}</p>
+        <div className="rs-answer-row correct-ans">
+          <span className="rs-answer-icon">✓</span>
+          <span>{q.correct_answer}</span>
+        </div>
       )}
 
-      {/* Explanation for all */}
       {q.Explanation && (
-        <div style={{
-          marginTop: '10px',
-          padding: '10px',
-          background: '#f3f4f6',
-          borderRadius: '6px',
-          fontSize: '14px',
-          color: '#374151'
-        }}>
-          <strong>Explanation:</strong> {q.Explanation}
+        <div className="rs-explanation">
+          <strong>Explanation</strong>
+          {q.Explanation}
         </div>
       )}
     </div>
   );
 
-  const tabs = [
-    { key: 'wrong', label: `Wrong (${wrong.length})`, color: '#ef4444' },
-    { key: 'skipped', label: `Skipped (${skipped.length})`, color: '#eab308' },
-    { key: 'correct', label: `Correct (${correct.length})`, color: '#22c55e' },
-  ];
+  const getTabClass = (key) => {
+    if (activeTab !== key) return 'rs-tab';
+    return `rs-tab active-${key}`;
+  };
 
   return (
-    <div style={{ maxWidth: '720px', margin: '0 auto', padding: '24px' }}>
+    <div className="rs-wrap">
+
+      {/* Header */}
+      <div className="rs-header">
+        <img src={logo} alt="HCM" className="rs-logo" />
+        <div className="rs-logo-name">HCM</div>
+      </div>
 
       {/* Score Card */}
-      <div style={{
-        background: '#1e293b',
-        color: '#fff',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '24px',
-        textAlign: 'center'
-      }}>
-        <h2 style={{ margin: 0, fontSize: '28px' }}>
-          {score} / {questions.length}
-        </h2>
-        <p style={{ margin: '8px 0 0', color: '#94a3b8' }}>
-          Time taken: {formatTime(timeTaken)} &nbsp;|&nbsp;
-          Wrong: {wrong.length} &nbsp;|&nbsp;
-          Skipped: {skipped.length}
-        </p>
+      <div className="rs-score-card">
+        <div className="rs-score-subject">
+          {subject}{chapter ? ` — ${chapter}` : ''}
+        </div>
+        <div className="rs-score-main">{score.toFixed(2)}</div>
+        <div className="rs-score-total">out of {questions.length}</div>
+        <div className="rs-score-stats">
+          <div className="rs-stat correct">
+            <div className="rs-stat-value">{correct.length}</div>
+            <div className="rs-stat-label">Correct</div>
+          </div>
+          <div className="rs-stat wrong">
+            <div className="rs-stat-value">{wrong.length}</div>
+            <div className="rs-stat-label">Wrong</div>
+          </div>
+          <div className="rs-stat skipped">
+            <div className="rs-stat-value">{skipped.length}</div>
+            <div className="rs-stat-label">Skipped</div>
+          </div>
+          <div className="rs-stat time">
+            <div className="rs-stat-value">{formatTime(timeTaken)}</div>
+            <div className="rs-stat-label">Time</div>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            style={{
-              flex: 1,
-              padding: '10px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              background: activeTab === tab.key ? tab.color : '#f1f5f9',
-              color: activeTab === tab.key ? '#fff' : '#64748b',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="rs-tabs">
+        <button className={getTabClass('wrong')} onClick={() => setActiveTab('wrong')}>
+          Wrong ({wrong.length})
+        </button>
+        <button className={getTabClass('skipped')} onClick={() => setActiveTab('skipped')}>
+          Skipped ({skipped.length})
+        </button>
+        <button className={getTabClass('correct')} onClick={() => setActiveTab('correct')}>
+          Correct ({correct.length})
+        </button>
       </div>
 
       {/* Tab Content */}
       <div>
         {activeTab === 'wrong' && (
           wrong.length === 0
-            ? <p style={{ color: '#64748b' }}>No wrong answers 🎉</p>
+            ? <div className="rs-empty">No wrong answers 🎉</div>
             : wrong.map((q, i) => <QuestionCard key={i} q={q} type="wrong" />)
         )}
         {activeTab === 'skipped' && (
           skipped.length === 0
-            ? <p style={{ color: '#64748b' }}>No skipped questions 🎉</p>
+            ? <div className="rs-empty">No skipped questions 🎉</div>
             : skipped.map((q, i) => <QuestionCard key={i} q={q} type="skipped" />)
         )}
         {activeTab === 'correct' && (
-          correct.map((q, i) => <QuestionCard key={i} q={q} type="correct" />)
+          correct.length === 0
+            ? <div className="rs-empty">No correct answers yet</div>
+            : correct.map((q, i) => <QuestionCard key={i} q={q} type="correct" />)
         )}
       </div>
 
-      {/* Back button */}
-      <button
-        onClick={() => navigate('/QuizSelection')}
-        style={{
-          marginTop: '24px',
-          width: '100%',
-          padding: '12px',
-          background: '#3b82f6',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '8px',
-          fontSize: '16px',
-          cursor: 'pointer',
-          fontWeight: 'bold'
-        }}
-      >
-        Back to Quiz Selection
-      </button>
+      {/* Action Buttons */}
+      <div className="rs-actions">
+        <button
+  className="rs-btn-retake"
+  onClick={() => {
+    attemptSaved = false; // reset so next attempt saves too
+    navigate('/Quiz', {
+      state: { subject, chapter, section }
+    });
+  }}
+>
+  Retake
+</button>
+        <button
+          className="rs-btn-back"
+          onClick={() => navigate('/QuizSelection')}
+        >
+          New Quiz
+        </button>
+      </div>
+
     </div>
   );
 }

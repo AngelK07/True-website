@@ -1,0 +1,369 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.qz-wrap {
+  background: #F4FAF4;
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 90px;
+}
+
+.qz-header {
+  background: #fff;
+  border-bottom: 1px solid #c8e6c9;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.qz-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qz-logo {
+  height: 36px;
+  object-fit: contain;
+}
+
+.qz-subject {
+  font-size: 11px;
+  color: #6b8f6b;
+  margin-top: 1px;
+}
+
+.qz-logo-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #16A34A;
+}
+
+.qz-timer {
+  background: #f0faf0;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #16A34A;
+}
+
+.qz-timer.urgent {
+  background: #fff0f0;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.qz-progress-wrap {
+  padding: 12px 16px 0;
+}
+
+.qz-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b8f6b;
+  margin-bottom: 6px;
+}
+
+.qz-progress-bar {
+  height: 6px;
+  background: #c8e6c9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.qz-progress-fill {
+  height: 100%;
+  background: #16A34A;
+  border-radius: 99px;
+  transition: width 0.3s;
+}
+
+.qz-content {
+  padding: 12px 16px;
+}
+
+.qz-card {
+  background: #fff;
+  border: 1px solid #c8e6c9;
+  border-radius: 14px;
+  padding: 18px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.08), 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.qz-qnum {
+  font-size: 11px;
+  font-weight: 600;
+  color: #16A34A;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.qz-qtext {
+  font-size: 15px;
+  color: #1a3d1a;
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.qz-divider {
+  height: 1px;
+  background: #e8f5e9;
+  margin-bottom: 14px;
+}
+
+.qz-opt {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #c8e6c9;
+  border-radius: 10px;
+  background: #f9fdf9;
+  color: #1a3d1a;
+  font-size: 14px;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.15s;
+}
+
+.qz-opt:active {
+  transform: scale(0.98);
+}
+
+.qz-opt.selected {
+  background: #f0faf0;
+  border-color: #16A34A;
+  color: #1a3d1a;
+}
+
+.qz-opt-label {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid #c8e6c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b8f6b;
+  flex-shrink: 0;
+}
+
+.qz-opt.selected .qz-opt-label {
+  background: #16A34A;
+  border-color: #16A34A;
+  color: #fff;
+}
+
+.qz-legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 4px 12px;
+  justify-content: center;
+}
+
+.qz-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #6b8f6b;
+}
+
+.qz-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Bottom Nav */
+.qz-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #c8e6c9;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 50;
+}
+
+.qz-nav-btn {
+  flex: 1;
+  padding: 11px 8px;
+  border: 1.5px solid #c8e6c9;
+  border-radius: 10px;
+  background: #f9fdf9;
+  color: #1a3d1a;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.qz-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qz-palette-btn {
+  flex: 1;
+  padding: 11px 8px;
+  border: 1.5px solid #16A34A;
+  border-radius: 10px;
+  background: #f0faf0;
+  color: #16A34A;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.qz-submit-btn {
+  flex: 1.4;
+  padding: 11px 8px;
+  border: none;
+  border-radius: 10px;
+  background: #16A34A;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.qz-submit-btn:active {
+  background: #15803d;
+  transform: scale(0.98);
+}
+
+/* Palette sidebar desktop */
+.qz-palette-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 220px;
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid #c8e6c9;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.qz-palette-header {
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #1a3d1a;
+  border-bottom: 1px solid #e8f5e9;
+}
+
+.qz-palette-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px;
+}
+
+.qz-palette-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #c8e6c9;
+  background: #f9fdf9;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a3d1a;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+}
+
+.qz-palette-num.current {
+  border: 2px solid #16A34A;
+  font-weight: 700;
+}
+
+.qz-palette-num.answered { background: #22c55e; color: #fff; border-color: #22c55e; }
+.qz-palette-num.skipped  { background: #eab308; color: #fff; border-color: #eab308; }
+.qz-palette-num.seen     { background: #fff; border-color: #9ca3af; }
+.qz-palette-num.not_visited { background: #9ca3af; color: #fff; border-color: #9ca3af; }
+
+/* Mobile drawer */
+.qz-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 2px solid #c8e6c9;
+  z-index: 200;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.qz-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8f5e9;
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a3d1a;
+}
+
+.qz-drawer-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b8f6b;
+  padding: 0;
+}
+
+/* Loading */
+.qz-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 12px;
+  color: #6b8f6b;
+  font-size: 14px;
+}
+
+.qz-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #c8e6c9;
+  border-top-color: #16A34A;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .qz-wrap { margin-right: 220px; }
+  .qz-bottom { right: 220px; }
+}

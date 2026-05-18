@@ -1,0 +1,265 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.rs-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  font-family: 'Outfit', sans-serif;
+  background: #F4FAF4;
+  min-height: 100vh;
+}
+
+.rs-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.rs-logo {
+  height: 36px;
+  object-fit: contain;
+}
+
+.rs-logo-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #16A34A;
+}
+
+/* Score Card */
+.rs-score-card {
+  background: #fff;
+  border: 1px solid #c8e6c9;
+  border-radius: 16px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.08), 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.rs-score-subject {
+  font-size: 12px;
+  color: #6b8f6b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.rs-score-main {
+  font-size: 48px;
+  font-weight: 700;
+  color: #16A34A;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.rs-score-total {
+  font-size: 16px;
+  color: #6b8f6b;
+  margin-bottom: 16px;
+}
+
+.rs-score-stats {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  border-top: 1px solid #e8f5e9;
+  padding-top: 16px;
+}
+
+.rs-stat {
+  flex: 1;
+  text-align: center;
+  border-right: 1px solid #e8f5e9;
+  padding: 0 12px;
+}
+
+.rs-stat:last-child {
+  border-right: none;
+}
+
+.rs-stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.rs-stat-label {
+  font-size: 11px;
+  color: #6b8f6b;
+}
+
+.rs-stat.correct .rs-stat-value { color: #16A34A; }
+.rs-stat.wrong .rs-stat-value { color: #ef4444; }
+.rs-stat.skipped .rs-stat-value { color: #eab308; }
+.rs-stat.time .rs-stat-value { color: #1a3d1a; }
+
+/* Tabs */
+.rs-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.rs-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1.5px solid #c8e6c9;
+  background: #f9fdf9;
+  color: #6b8f6b;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rs-tab.active-wrong {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.rs-tab.active-skipped {
+  background: #fefce8;
+  border-color: #eab308;
+  color: #b45309;
+}
+
+.rs-tab.active-correct {
+  background: #f0faf0;
+  border-color: #16A34A;
+  color: #16A34A;
+}
+
+/* Question Cards */
+.rs-qcard {
+  background: #fff;
+  border: 1px solid #c8e6c9;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.06), 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.rs-qnum {
+  font-size: 11px;
+  font-weight: 600;
+  color: #16A34A;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.rs-qtext {
+  font-size: 14px;
+  color: #1a3d1a;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.rs-divider {
+  height: 1px;
+  background: #e8f5e9;
+  margin-bottom: 10px;
+}
+
+.rs-answer-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.rs-answer-row.wrong-ans {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.rs-answer-row.correct-ans {
+  background: #f0faf0;
+  color: #15803d;
+}
+
+.rs-answer-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.rs-explanation {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #f9fdf9;
+  border-left: 3px solid #16A34A;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.rs-explanation strong {
+  color: #16A34A;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rs-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b8f6b;
+  font-size: 15px;
+}
+
+/* Buttons */
+.rs-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.rs-btn-retake {
+  flex: 1;
+  padding: 13px;
+  border: 1.5px solid #16A34A;
+  border-radius: 12px;
+  background: #f0faf0;
+  color: #16A34A;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.rs-btn-back {
+  flex: 1;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: #16A34A;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.rs-btn-retake:active, .rs-btn-back:active {
+  transform: scale(0.98);
+}
+
+@media (min-width: 768px) {
+  .rs-wrap {
+    padding: 32px 24px 60px;
+  }
+}
