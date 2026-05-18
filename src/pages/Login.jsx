@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/authProvider";
 import "../Css/Login.css";
 import logo from "../assets/logo.png";
@@ -99,6 +99,15 @@ export default function Login() {
               </svg>
               Only registered students can log in. Make sure to use the email you signed up with.
             </div>
+
+            {/* ── Payment CTA ── */}
+            <div className="login-payment-cta">
+              <span>New here?</span>
+              <Link to="/payment" className="login-payment-link">
+                Get access — NPR 999 →
+              </Link>
+            </div>
+
           </div>
 
         ) : (

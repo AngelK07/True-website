@@ -7,6 +7,7 @@ import Verify from '../context/verify'
 import QuizSelection from './pages/QuizSelction'
 import QuizLogic from './pages/Quiz'
 import Result from './pages/result'
+import Payment from './pages/Payment'  // adjust path if needed
 function App() {
   return (
     <AuthProvider>
@@ -29,6 +30,9 @@ function App() {
             <ProtectedRoute>
               <Result/>
               </ProtectedRoute>
+          }/>
+          <Route path="/payment" element={
+              <Payment/>
           }/>
         </Routes>
       </BrowserRouter>

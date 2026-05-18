@@ -17,11 +17,15 @@ export default function QuizSelection() {
 
   const syllabus = {
     Physics: {
-      "Mechanics": [],
-      "Heat and Thermodynamics": [],
-      "Waves and Optics": [],
-      "Current Electricity and Magnetism": [],
-      "Modern Physics": []
+      "Mechanics": ["Rotational Motion", "Simple Harmonic Motion","Surface Tension", "Fluid Mechanics", "Hydrostats"],
+      "Heat and Thermodynamics": ["Thermometry", "Thermal Expansion", "Calorimetry,Change of state and Hygrometry",
+                                  " theory Kineticof gases", "transmission of heat", "Thermodynamics"
+      ],
+      "Waves and Optics": ["Waves and its characteristics", "Refraction and SuperposReflectionition of waves", "Vibration of string,Rods and air columns, waves in pipes"
+                           ,"Musical Sound and Doppler Effect", "wave nature of light,Inference,Diffraction and Polarization of light"
+      ],
+      "Current Electricity and Magnetism": ["ThermoElectricity", "Magnetic Effect of Current","Electromagnetic Induction","Alternating Current","Moving coil Meter"],
+      "Modern Physics": ["Charged particles","Radioactivity","X-rays","Photoelectricity","Atomic Structure","Semiconductor devices","Electormagnetic waves","Relativity"]
     },
     Chemistry: {
       "Physical Chemistry": [],
@@ -52,10 +56,10 @@ export default function QuizSelection() {
       "Applied botany": ["Application of Biology"],
     },
     MAT: {
-      "Verbal reasoning": [],
-      "Numerical reasoning": [],
-      "Logical sequencing": [],
-      "Spatial relation": [],
+      "Verbal Reasoning": ["Analogy","Classification","Coding and decoding","Series","Inserting the Missing  Character","Ranking and Timer Sequence Test", "Venn Diagram" , "Blood Relations","Clock","Calender","Direction & Distance","Sitting Arrangement"],
+      "Numerical Reasoning": ["Number systems","Percentage","Profit and loss","Simple Intrest","Compound Intrest","Average","Time and Work","Age","Arithmetic Reasoning","Permutation and Computation",],
+      "Logical Sequencing": [],
+      "Spatial Relation": [],
     }
   }
 
