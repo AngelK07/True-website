@@ -1,10 +1,12 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../context/authProvider"
 import logo from "../assets/logo.png"
 import '../Css/QuizSelection.css'
 
 export default function QuizSelection() {
   const navigate = useNavigate()
+  const { handleLogout } = useAuth()
   const [username, setUsername] = useState('')
   const [subject, setSubject] = useState('')
   const [chapter, setChapter] = useState('')
@@ -71,6 +73,11 @@ export default function QuizSelection() {
     setSection('')
   }
 
+  async function onLogout() {
+    await handleLogout()
+    navigate('/Login')
+  }
+
   function handleSubmit() {
     if (mode === 'chapter') {
       if (!subject) return
@@ -86,6 +93,12 @@ export default function QuizSelection() {
 
   return (
     <div className="qs-wrap">
+
+      <div className="qs-top">
+        <button type="button" className="qs-logout-btn" onClick={onLogout}>
+          Logout
+        </button>
+      </div>
 
       {/* Logo */}
       <div className="qs-logo-area">
