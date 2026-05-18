@@ -16,4 +16,5 @@ export default function Verify() {
     if (authError) return <div><h1>Error: {authError}</h1></div>
     
     return <div><h1>Loading...</h1></div>
+    //fixed bug idk just force deploying and it worked idk why it was not working before
 }
