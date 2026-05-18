@@ -24,7 +24,7 @@
   align-items: center;
   gap: 8px;
 }
-
+/* Logo and Subject */
 .qz-logo {
   height: 36px;
   object-fit: contain;
