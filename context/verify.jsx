@@ -1,20 +1,47 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../context/authProvider"
+import { supabaseClient } from "../API/supabase"
 
 export default function Verify() {
-    const { verifyiing, authError, authSuccess } = useAuth()
     const navigate = useNavigate()
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
-        if (authSuccess) {
-            navigate('/QuizSelection', { replace: true })
-        }
-    }, [authSuccess])
+        const verifyUser = async () => {
+            const { data, error } = await supabaseClient.auth.getSession()
 
-    if (verifyiing) return <div><h1>Verifying...</h1></div>
-    if (authError) return <div><h1>Error: {authError}</h1></div>
-    
-    return <div><h1>Loading...</h1></div>
-    //fixed bug idk just force deploying and it worked idk why it was not working before
+            if (error) {
+                setError(error.message)
+                setLoading(false)
+                return
+            }
+
+            if (data.session) {
+                navigate("/QuizSelection", { replace: true })
+            } else {
+                navigate("/login", { replace: true })
+            }
+        }
+
+        verifyUser()
+    }, [navigate])
+
+    if (loading) {
+        return (
+            <div>
+                <h1>Verifying...</h1>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div>
+                <h1>Error: {error}</h1>
+            </div>
+        )
+    }
+
+    return null
 }

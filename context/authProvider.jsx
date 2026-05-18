@@ -30,10 +30,12 @@ export default function AuthProvider({children}){
 const handleLogin = async (e,email) => {
     e.preventDefault()
     setloading(true)
-    const {error} = await supabaseClient.auth.signInWithOtp({email
-        ,options:{
-            emailRedirectTo: window.location.origin + "/verify",}
-        })
+const { error } = await supabaseClient.auth.signInWithOtp({
+  email,
+  options: {
+    emailRedirectTo: `${window.location.origin}/verify`
+  }
+})
     if(error){
         alert(error.error_description || error.message)
     }
