@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/authProvider";
 import "../Css/Login.css";
+import logo from "../assets/logo.png";
 
 export default function Login() {
   const { handleLogin, user } = useAuth();
@@ -24,7 +25,7 @@ export default function Login() {
       {/* ── Left branding panel ── */}
       <div className="login-left">
         <img
-          src="/logo.png"
+          src={logo}
           alt="HighCareMentor logo"
           className="login-left-logo"
         />
