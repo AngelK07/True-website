@@ -9,7 +9,7 @@ let attemptSaved = false;
 export default function Result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { questions, answers, timeTaken, subject, chapter, section } = location.state || {};
+  const { username, questions, answers, timeTaken, subject, chapter, section } = location.state || {};
 
   const [activeTab, setActiveTab] = useState("wrong");
 
@@ -46,6 +46,7 @@ export default function Result() {
       const { error } = await supabaseClient
         .from('quiz_attempts')
         .insert({
+          username: username,
           student_id: user.id,
           Subject: subject,
           Chapter: chapter,

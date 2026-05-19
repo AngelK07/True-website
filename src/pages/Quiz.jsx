@@ -88,7 +88,7 @@ export default function QuizLogic() {
   const [error, setError] = useState(false);
   const [timeLeft, setTimeLeft] = useState(2700);
   const [quizStarted, setQuizStarted] = useState(false);
-  const [questionStatuses, setQuestionStatuses] = useState(Array(50).fill('not_visited'));
+  const [questionStatuses, setQuestionStatuses] = useState([]);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const updateStatus = (index, status) => {
@@ -158,6 +158,7 @@ export default function QuizLogic() {
         return { ...q, options: shuffledOptions, correct_answer: correctText };
       });
       setQuestion(processed);
+      setQuestionStatuses(Array(processed.length).fill('not_visited'));
       setQuizStarted(true);
     }
     setLoading(false);
@@ -209,7 +210,15 @@ export default function QuizLogic() {
         )}
 
         {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '40px' }}>Failed to load questions. Please go back and try again.</p>}
-
+        
+        {!loading && !error && question.length === 0 && (
+          <div className="qz-empty">
+          <div className="qz-empty-icon">📭</div>
+          <h3>No questions available yet</h3>
+    <p>We're still adding questions for this chapter. Check back soon!</p>
+          <button className="qz-nav-btn" onClick={() => navigate('/QuizSelection')}>Go Back</button>
+        </div>
+      )}
         {!loading && !error && question.length > 0 && (
           <div className="qz-card">
             <div className="qz-qnum">Question {current + 1}</div>
