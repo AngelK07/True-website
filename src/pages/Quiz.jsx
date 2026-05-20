@@ -78,7 +78,8 @@ const QuestionPalette = ({ statuses, current, onJump, isOpen, onClose }) => {
 export default function QuizLogic() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { subject, chapter, section } = location.state || {};
+  // modelNo will be set when coming from CEE mode
+  const { subject, chapter, section, modelNo, username } = location.state || {};
 
   const [question, setQuestion] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -90,6 +91,8 @@ export default function QuizLogic() {
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionStatuses, setQuestionStatuses] = useState([]);
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  const isCEE = subject === 'CEE';
 
   const updateStatus = (index, status) => {
     setQuestionStatuses(prev => {
@@ -131,6 +134,7 @@ export default function QuizLogic() {
     setQuizStarted(false);
     navigate('/result', {
       state: {
+        username,
         questions: question,
         answers: answers,
         timeTaken: 2700 - timeLeft,
@@ -141,22 +145,51 @@ export default function QuizLogic() {
 
   async function LoadQuestions() {
     setLoading(true);
-    const { data, error } = await supabaseClient.rpc('get_random_questions', {
-      p_subject: subject,
-      p_chapter: chapter,
-      p_section: section,
-      p_limit: 50
-    });
 
-    if (error) {
+    let data, err;
+
+    if (isCEE) {
+      // CEE mode: fetch all CEE questions ordered by mcq_id (upload order)
+      const result = await supabaseClient
+        .from('mcq')
+        .select('*')
+        .eq('Subject', 'CEE')
+        .order('mcq_id', { ascending: true });
+
+      data = result.data;
+      err = result.error;
+    } else {
+      // Chapter practice: use existing RPC
+      const result = await supabaseClient.rpc('get_random_questions', {
+        p_subject: subject,
+        p_chapter: chapter,
+        p_section: section,
+        p_limit: 50
+      });
+
+      data = result.data;
+      err = result.error;
+    }
+
+    if (err) {
       setError(true);
     } else {
       const processed = data.map(q => {
         const optionsMap = { 'A': q.option_a, 'B': q.option_b, 'C': q.option_c, 'D': q.option_d };
         const correctText = optionsMap[q.correct_answer];
-        const shuffledOptions = [q.option_a, q.option_b, q.option_c, q.option_d].sort(() => Math.random() - 0.5);
-        return { ...q, options: shuffledOptions, correct_answer: correctText };
+
+        let options;
+        if (isCEE) {
+          // CEE: keep original option order, no shuffle
+          options = [q.option_a, q.option_b, q.option_c, q.option_d];
+        } else {
+          // Chapter practice: shuffle options
+          options = [q.option_a, q.option_b, q.option_c, q.option_d].sort(() => Math.random() - 0.5);
+        }
+
+        return { ...q, options, correct_answer: correctText };
       });
+
       setQuestion(processed);
       setQuestionStatuses(Array(processed.length).fill('not_visited'));
       setQuizStarted(true);
@@ -178,7 +211,9 @@ export default function QuizLogic() {
           <img src={logo} alt="HCM" className="qz-logo" />
           <div>
             <div className="qz-logo-name">HCM</div>
-            <div className="qz-subject">{subject}{chapter ? ` — ${chapter}` : ''}</div>
+            <div className="qz-subject">
+              {isCEE ? `CEE Model ${modelNo}` : `${subject}${chapter ? ` — ${chapter}` : ''}`}
+            </div>
           </div>
         </div>
         {quizStarted && !submitted && (
@@ -210,15 +245,16 @@ export default function QuizLogic() {
         )}
 
         {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '40px' }}>Failed to load questions. Please go back and try again.</p>}
-        
+
         {!loading && !error && question.length === 0 && (
           <div className="qz-empty">
-          <div className="qz-empty-icon">📭</div>
-          <h3>No questions available yet</h3>
-    <p>We're still adding questions for this chapter. Check back soon!</p>
-          <button className="qz-nav-btn" onClick={() => navigate('/QuizSelection')}>Go Back</button>
-        </div>
-      )}
+            <div className="qz-empty-icon">📭</div>
+            <h3>No questions available yet</h3>
+            <p>We're still adding questions for this chapter. Check back soon!</p>
+            <button className="qz-nav-btn" onClick={() => navigate('/QuizSelection')}>Go Back</button>
+          </div>
+        )}
+
         {!loading && !error && question.length > 0 && (
           <div className="qz-card">
             <div className="qz-qnum">Question {current + 1}</div>
