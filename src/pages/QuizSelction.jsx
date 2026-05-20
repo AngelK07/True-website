@@ -76,6 +76,7 @@ export default function QuizSelection() {
 
   const handleSubjectChange = (e) => {
     setSubject(e.target.value)
+    
     setChapter('')
     setSection('')
   }
