@@ -87,7 +87,7 @@ export default function QuizLogic() {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(2700);
+  const [timeLeft, setTimeLeft] = useState(subject === 'CEE' ? 10800 : 2700);
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionStatuses, setQuestionStatuses] = useState([]);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -137,7 +137,7 @@ export default function QuizLogic() {
         username,
         questions: question,
         answers: answers,
-        timeTaken: 2700 - timeLeft,
+        timeTaken: (isCEE ? 10800 : 2700) - timeLeft,
         subject, chapter, section
       }
     });
