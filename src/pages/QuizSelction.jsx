@@ -90,18 +90,18 @@ export default function QuizSelection() {
     navigate('/Login')
   }
 
-  function handleSubmit() {
-    if (mode === 'chapter') {
-      if (!subject) return
-      navigate('/Quiz', { state: { username, subject, chapter, section } })
-    } else if (mode === 'weekly') {
-      if (!selWeek) return
-      alert('Week ' + selWeek + ' test — coming soon')
-    } else {
-      if (!selCee) return
-      alert('Model ' + selCee + ' — coming soon')
-    }
+ function handleSubmit() {
+  if (mode === 'chapter') {
+    if (!subject) return
+    navigate('/Quiz', { state: { username, subject, chapter, section } })
+  } else if (mode === 'weekly') {
+    if (!selWeek) return
+    alert('Week ' + selWeek + ' test — coming soon')
+  } else {
+    if (!selCee) return
+    navigate('/Quiz', { state: { username, subject: 'CEE', chapter: '', section: '', modelNo: selCee } })
   }
+}
 
   return (
     <div className="qs-wrap">
