@@ -1,8 +1,9 @@
-import React, { useState } from "react"
+import React, { useState,useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/authProvider"
 import logo from "../assets/logo.png"
 import '../Css/QuizSelection.css'
+import supabaseClient from "../../API/supabase"
 
 export default function QuizSelection() {
   const navigate = useNavigate()
@@ -13,7 +14,10 @@ export default function QuizSelection() {
   const [section, setSection] = useState('')
   const [mode, setMode] = useState('chapter')
   const [selWeek, setSelWeek] = useState(null)
+  const [weeklabels, setWeeklabels] = useState([])
+  const [ceelabels, setCeelabels] = useState([])
   const [selCee, setSelCee] = useState(null)
+  const [labelloading,setlabelloading] = useState(false)
 
   const syllabus = {
     Physics: {
@@ -74,6 +78,27 @@ export default function QuizSelection() {
   const chapters = subject ? Object.keys(syllabus[subject]) : []
   const sections = chapter ? syllabus[subject][chapter] : []
 
+useEffect(() =>  {
+  if(mode === 'weekly') fetchlabels('weekly',setWeeklabels)
+  if (mode === 'cee') fetchlabels('CEE',setCeelabels)
+},[mode])
+
+  async function fetchlabels(testType, setter){
+    setlabelloading(true)
+    const { data,error} = await supabaseClient
+      .from('mcq')
+      .select('test_label')
+      .eq('test_type', testType)
+      .not('test_label','is',null)
+
+      if(!error && data){
+        //get unique label, preserve order
+        const unique = [...new Set(data.map(r => r.test_label))]
+        setter(unique)
+      }
+      setlabelloading(false)
+  }
+
   const handleSubjectChange = (e) => {
     setSubject(e.target.value)
     
@@ -97,10 +122,10 @@ export default function QuizSelection() {
     navigate('/Quiz', { state: { username, subject, chapter, section } })
   } else if (mode === 'weekly') {
     if (!selWeek) return
-    alert('Week ' + selWeek + ' test — coming soon')
+    navigate('/Quiz',{ state: { username, subject: 'Weekly', test_type: 'weekly', test_label: selWeek } })
   } else {
     if (!selCee) return
-    navigate('/Quiz', { state: { username, subject: 'CEE', chapter: '', section: '', modelNo: selCee } })
+    navigate('/Quiz', { state: { username, subject: 'CEE', test_type: 'CEE', test_label: selCee } })
   }
 }
 
@@ -200,37 +225,50 @@ export default function QuizSelection() {
         <div className="qs-section-box">
           <div className="qs-section-title">📅 Weekly Test</div>
           <div className="qs-field"><label>Select week</label></div>
+          {labelloading ? (
+            <p style  ={{textAlign: 'center',color:'#888'}}>Loading...</p>
+          ):  weeklabels.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#888' }}>No tests available</p>
+          ) : (
           <div className="qs-weekly-grid">
-            {Array.from({ length: 20 }, (_, i) => i + 1).map(w => (
+            {weeklabels.map(label => (
               <button
-                key={w}
-                className={`qs-week-btn ${selWeek === w ? 'selected' : ''}`}
-                onClick={() => setSelWeek(w)}
+                key={label}
+                className={`qs-week-btn ${selWeek === label ? 'selected' : ''}`}
+                onClick={() => setSelWeek(label)}
               >
-                Week {w}
+                {label}
               </button>
             ))}
           </div>
-        </div>
+      )}
+      </div>
       )}
 
-      {/* CEE Full Test Section */}
+           {/* CEE Full Test Section */}
       {mode === 'cee' && (
         <div className="qs-section-box">
           <div className="qs-section-title">🎯 CEE Full Test — Model Papers</div>
-          <div className="qs-cee-grid">
-            {Array.from({ length: 20 }, (_, i) => i + 1).map(m => (
-              <button
-                key={m}
-                className={`qs-cee-btn ${selCee === m ? 'selected' : ''}`}
-                onClick={() => setSelCee(m)}
-              >
-                Model {m}
-              </button>
-            ))}
-          </div>
+          {labelloading ? (
+            <p style={{ textAlign: 'center', color: '#888' }}>Loading...</p>
+          ) : ceelabels.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#888' }}>No CEE tests available yet.</p>
+          ) : (
+            <div className="qs-cee-grid">
+              {ceelabels.map(label => (
+                <button
+                  key={label}
+                  className={`qs-cee-btn ${selCee === label ? 'selected' : ''}`}
+                  onClick={() => setSelCee(label)}
+                >
+                  CEE {label}  {/* "2024" from DB becomes "CEE 2024" */}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
+
 
       {/* Warning */}
       <div className="qs-warning">

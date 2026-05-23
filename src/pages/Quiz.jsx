@@ -79,7 +79,7 @@ export default function QuizLogic() {
   const navigate = useNavigate();
   const location = useLocation();
   // modelNo will be set when coming from CEE mode
-  const { subject, chapter, section, modelNo, username } = location.state || {};
+  const { subject, chapter, section, test_label, username } = location.state || {};
 
   const [question, setQuestion] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -87,12 +87,13 @@ export default function QuizLogic() {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(subject === 'CEE' ? 10800 : 2700);
   const [quizStarted, setQuizStarted] = useState(false);
   const [questionStatuses, setQuestionStatuses] = useState([]);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const isCEE = subject === 'CEE';
+  const isWeekly = subject === 'Weekly';
+  const [timeLeft, setTimeLeft] = useState((isWeekly || isCEE) ? 10800 : 2700);
 
   const updateStatus = (index, status) => {
     setQuestionStatuses(prev => {
@@ -137,8 +138,8 @@ export default function QuizLogic() {
         username,
         questions: question,
         answers: answers,
-        timeTaken: (isCEE ? 10800 : 2700) - timeLeft,
-        subject, chapter, section
+        timeTaken: (isCEE || isWeekly ? 10800 : 2700) - timeLeft,
+        subject, chapter, section, test_label
       }
     });
   }
@@ -153,12 +154,29 @@ export default function QuizLogic() {
       const result = await supabaseClient
         .from('mcq')
         .select('*')
-        .eq('Subject', 'CEE')
+        .eq('test_type', 'CEE')
+        .eq('test_label', test_label)
         .order('mcq_id', { ascending: true });
 
       data = result.data;
       err = result.error;
-    } else {
+    } 
+    if (isWeekly){
+      // Weekly quiz: fetch questions from 'weekly_quiz' table
+      const result = await supabaseClient
+        .from('mcq')
+        .select('*')
+        .eq('test_type', 'weekly')
+        .eq('test_label', test_label)
+        .order('mcq_id', { ascending: true });
+
+      data = result.data;
+      err = result.error;
+
+
+    }
+
+    else {
       // Chapter practice: use existing RPC
       const result = await supabaseClient.rpc('get_random_questions', {
         p_subject: subject,
@@ -179,7 +197,7 @@ export default function QuizLogic() {
         const correctText = optionsMap[q.correct_answer];
 
         let options;
-        if (isCEE) {
+        if (isCEE || isWeekly) {
           // CEE: keep original option order, no shuffle
           options = [q.option_a, q.option_b, q.option_c, q.option_d];
         } else {
@@ -212,7 +230,7 @@ export default function QuizLogic() {
           <div>
             <div className="qz-logo-name">HCM</div>
             <div className="qz-subject">
-              {isCEE ? `CEE Model ${modelNo}` : `${subject}${chapter ? ` — ${chapter}` : ''}`}
+              {isCEE ? `CEE Model ${test_label}` : isWeekly ? `Weekly Test ${test_label}` : `${subject}${chapter ? ` — ${chapter}` : ''}`}
             </div>
           </div>
         </div>
