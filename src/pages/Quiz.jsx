@@ -22,9 +22,10 @@ const TimerDisplay = ({ timeLeft, setTimeLeft, onTimeUp }) => {
   }, []);
 
   const formatTimer = (s) => {
-    const mins = Math.floor(s / 60);
+    const hrs = Math.floor(s / 3600);
+    const mins = Math.floor((s % 3600)/60);
     const sec = s % 60;
-    return `${String(mins).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
   };
 
   return (
@@ -161,7 +162,7 @@ export default function QuizLogic() {
       data = result.data;
       err = result.error;
     } 
-    if (isWeekly){
+    else if (isWeekly){
       // Weekly quiz: fetch questions from 'weekly_quiz' table
       const result = await supabaseClient
         .from('mcq')
