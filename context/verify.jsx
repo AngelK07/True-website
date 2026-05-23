@@ -18,6 +18,19 @@ export default function Verify() {
             }
 
             if (data.session) {
+                const user = data.session.user
+                const { data: upsertData, error: upsertError } = await supabaseClient
+                    .from("profiles")
+                    .upsert({
+                        id: user.id,
+                        email: user.email,
+                        username: user.email,
+                        created_at: new Date().toISOString()
+                    }, { 
+                    onConflict: "id",
+                    ignoreDuplicates: false
+                    })//wont change if the id already exists
+                setLoading(false)
                 navigate("/QuizSelection", { replace: true })
             } else {
                 navigate("/login", { replace: true })
