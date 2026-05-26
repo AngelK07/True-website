@@ -76,6 +76,31 @@ const QuestionPalette = ({ statuses, current, onJump, isOpen, onClose }) => {
   return <>{sidebar}{drawer}</>;
 };
 
+  //For the images one
+  function QuizImage({ mcq_id }) {
+  const [hasImage, setHasImage] = useState(true);
+   useEffect(() => {
+    setHasImage(true);  // reset when question changes
+  }, [mcq_id]);
+
+
+  if (!hasImage) return null;
+
+  return (
+    <div className="qz-image-wrap">
+      <img
+        src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/mcq_images/${mcq_id}.png`}
+        alt="Question figure"
+        className="qz-image"
+        onError={(e) => {
+          setHasImage(false);
+        }}
+      />
+    </div>
+  );
+}
+
+
 export default function QuizLogic() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -144,7 +169,7 @@ export default function QuizLogic() {
       }
     });
   }
-
+  
   async function LoadQuestions() {
     setLoading(true);
 
@@ -278,6 +303,7 @@ export default function QuizLogic() {
           <div className="qz-card">
             <div className="qz-qnum">Question {current + 1}</div>
             <div className="qz-qtext">{question[current]?.Questions}</div>
+            <QuizImage mcq_id={question[current]?.mcq_id} />
             <div className="qz-divider"></div>
 
             {question[current].options.map((opt, i) => (

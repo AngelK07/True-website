@@ -265,6 +265,37 @@
   transform: scale(0.98);
 }
 
+/* Question Image */
+.qz-img-wrap {
+  width: 100%;
+  max-height: 260px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4faf4;
+  border: 1px solid #e8f5e9;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 0 16px 0;
+}
+
+.qz-img {
+  max-width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .qz-img-wrap {
+    max-height: 380px;
+  }
+
+  .qz-img {
+    max-height: 380px;
+  }
+}
+
 /* Palette sidebar desktop */
 .qz-palette-sidebar {
   position: fixed;
