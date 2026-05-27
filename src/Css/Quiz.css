@@ -268,6 +268,7 @@
 /* Question Image */
 .qz-img-wrap {
   width: 100%;
+  max-width: 100%;
   max-height: 260px;
   display: flex;
   justify-content: center;
@@ -277,11 +278,14 @@
   border-radius: 10px;
   overflow: hidden;
   margin: 0 0 16px 0;
+  box-sizing:border-box;
 }
 
 .qz-img {
   max-width: 100%;
+  width: 100%;
   max-height: 260px;
+  height:auto;
   object-fit: contain;
   display: block;
 }

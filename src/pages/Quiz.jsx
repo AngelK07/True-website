@@ -86,12 +86,13 @@ const QuestionPalette = ({ statuses, current, onJump, isOpen, onClose }) => {
 
   if (!hasImage) return null;
 
+
   return (
-    <div className="qz-image-wrap">
+    <div className="qz-img-wrap">
       <img
         src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/mcq_images/${mcq_id}.png`}
         alt="Question figure"
-        className="qz-image"
+        className="qz-img"
         onError={(e) => {
           setHasImage(false);
         }}
