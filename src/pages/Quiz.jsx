@@ -86,7 +86,6 @@ const QuestionPalette = ({ statuses, current, onJump, isOpen, onClose }) => {
 
   if (!hasImage) return null;
 
-
   return (
     <div className="qz-img-wrap">
       <img
