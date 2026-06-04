@@ -7,6 +7,22 @@ export default function Verify() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
+useEffect(() => {
+    const ua = navigator.userAgent;
+    const isWebView = (
+        ua.includes('wv') ||
+        /gmail/i.test(ua) ||
+        ua.includes('FBAN') ||
+        ua.includes('FBAV')
+    );
+
+    if (isWebView) {
+        const url = window.location.href;
+        window.location.href = `intent://${url.replace(/https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+        return; // stop here, let Chrome reload the page
+    }
+    }, []);
+
     useEffect(() => {
         const verifyUser = async () => {
             const { data, error } = await supabaseClient.auth.getSession()
