@@ -157,6 +157,9 @@ export default function QuizLogic() {
   const handlePrev = () => setCurrent(c => c - 1);
 
   function handleSubmit() {
+    const confirmed = window.confirm("Are you sure you want to submit? You won't be able to change your answers after submitting.");
+    if (!confirmed) return;
+
     setSubmitted(true);
     setQuizStarted(false);
     navigate('/result', {
