@@ -105,7 +105,7 @@ export default function QuizLogic() {
   const navigate = useNavigate();
   const location = useLocation();
   // modelNo will be set when coming from CEE mode
-  const { subject, chapter, section, test_label, username } = location.state || {};
+  const { subject, chapter, section, test_label, username, } = location.state || {};
 
   const [question, setQuestion] = useState([]);
   const [current, setCurrent] = useState(0);

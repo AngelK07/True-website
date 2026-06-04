@@ -9,7 +9,7 @@ let attemptSaved = false;
 export default function Result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { username, questions, answers, timeTaken, subject, chapter, section } = location.state || {};
+  const { username, questions, answers, timeTaken, subject, chapter, section, test_label, test_type } = location.state || {};
 
   const [activeTab, setActiveTab] = useState("wrong");
 
@@ -41,23 +41,38 @@ export default function Result() {
     attemptSaved = true;
 
     async function saveAttempt() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) return;
-      const { error } = await supabaseClient
-        .from('quiz_attempts')
-        .insert({
-          username: username,
-          student_id: user.id,
-          Subject: subject,
-          Chapter: chapter,
-          Section: section,
-          answers: answers,
-          score: score,
-          time_taken: timeTaken,
-          attempted_at: new Date().toISOString()
-        });
-      if (error) console.log("Save failed:", error);
-    }
+      const { data, error } = await supabaseClient
+      .from('quiz_attempts')
+      .insert({
+        score: score,
+        time_taken: timeTaken,
+        test_type: test_type,
+        test_label: test_label,
+        total: questions.length,
+        subject: subject,
+        chapter: chapter
+      })
+      .select('attempt_id')
+      .single();
+
+    if (error) { console.error('Attempt save failed:', error); return; }
+
+    const attemptId = data.attempt_id;
+
+    const answerRows = questions.map((q) => ({
+      attempt_id: attemptId,
+      mcq_id: q.mcq_id,
+      selected: answers[q.mcq_id] || null,
+      is_correct: answers[q.mcq_id] === q.correct_answer,
+      time_taken: null
+    }));
+
+    const { error: ansError } = await supabaseClient
+      .from('attempt_answers')
+      .insert(answerRows);
+
+    if (ansError) console.error('Answers save failed:', ansError);
+  }
     saveAttempt();
   }, []);
 
@@ -189,7 +204,7 @@ export default function Result() {
   onClick={() => {
     attemptSaved = false; // reset so next attempt saves too
     navigate('/Quiz', {
-      state: { subject, chapter, section }
+      state: { subject, chapter, section, test_label}
     });
   }}
 >
