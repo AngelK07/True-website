@@ -4,6 +4,53 @@ import supabaseClient from "../../API/supabase";
 import logo from "../assets/logo.png";
 import '../Css/Quiz.css';
 
+// CEE new syllabus chapter weightage for 50-question subject-only practice
+const CHAPTER_WEIGHTS = {
+  Physics: {
+    "Mechanics": 10,
+    "Heat and Thermodynamics": 7,
+    "Waves and Optics": 8,
+    "Current Electricity and Magnetism": 9,
+    "Modern Physics": 12,
+    // Electrostatics is not a separate chapter in your syllabus object
+    // so its 4 questions are absorbed into Modern Physics → bumped to 12, rest stays 50 total
+  },
+  Chemistry: {
+    "Physical Chemistry": 17,
+    "Inorganic Chemistry": 10,
+    "Organic Chemistry": 17,
+    "Applied Chemistry": 4,
+    "Analytical chemistry": 2,
+  },
+  Zoology: {
+    "Human Biology and Physiology": 19,
+    "Study of Selected Animals": 8,
+    "Animal Diversity and Classification": 6,
+    "Animal Tissue and Histology": 5,
+    "Evolutionary Biology": 4,
+    "Microbial Diseases and Immunology": 5,
+    "Medical Technology and Applied Biology": 2,
+    "Biota, Environment and Conservation": 1,
+  },
+  Botany: {
+    "Biodiversity": 11,
+    "Genetics": 8,
+    "Plant physiology": 8,
+    "Cell Biology": 6,
+    "Ecology and vegetation": 5,
+    "Plant anatomy": 4,
+    "Developmental botany": 4,
+    "Applied botany": 3,
+    "Basic component of life": 1,
+  },
+  MAT: {
+    "Verbal Reasoning": 15,
+    "Numerical reasoning": 15,
+    "Logical Sequencing": 10,
+    "Spatial Relation/Abstract Reasoning": 10,
+  },
+}
+
 const TimerDisplay = ({ timeLeft, setTimeLeft, onTimeUp }) => {
   const timerRef = useRef(null);
 
@@ -168,82 +215,106 @@ export default function QuizLogic() {
         questions: question,
         answers: answers,
         timeTaken: (isCEE || isWeekly ? 10800 : 2700) - timeLeft,
-        subject, chapter, section, test_label
+        subject, chapter, section, test_label , test_type: isCEE ? 'CEE' : isWeekly ? 'weekly' : 'chapter'
+        
       }
     });
   }
   
   async function LoadQuestions() {
-    setLoading(true);
+  setLoading(true);
 
-    let data, err;
+  let data, err;
 
-    if (isCEE) {
-      // CEE mode: fetch all CEE questions ordered by mcq_id (upload order)
-      const result = await supabaseClient
-        .from('mcq')
-        .select('*')
-        .eq('test_type', 'CEE')
-        .eq('test_label', test_label)
-        .order('mcq_id', { ascending: true });
+  if (isCEE) {
+    const result = await supabaseClient
+      .from('mcq')
+      .select('*')
+      .eq('test_type', 'CEE')
+      .eq('test_label', test_label)
+      .order('mcq_id', { ascending: true });
+    data = result.data;
+    err = result.error;
 
-      data = result.data;
-      err = result.error;
-    } 
-    else if (isWeekly){
-      // Weekly quiz: fetch questions from 'weekly_quiz' table
-      const result = await supabaseClient
-        .from('mcq')
-        .select('*')
-        .eq('test_type', 'weekly')
-        .eq('test_label', test_label)
-        .order('mcq_id', { ascending: true });
+  } else if (isWeekly) {
+    const result = await supabaseClient
+      .from('mcq')
+      .select('*')
+      .eq('test_type', 'weekly')
+      .eq('test_label', test_label)
+      .order('mcq_id', { ascending: true });
+    data = result.data;
+    err = result.error;
 
-      data = result.data;
-      err = result.error;
-
-
-    }
-
-    else {
-      // Chapter practice: use existing RPC
-      const result = await supabaseClient.rpc('get_random_questions', {
-        p_subject: subject,
-        p_chapter: chapter,
-        p_section: section,
-        p_limit: 50
-      });
-
-      data = result.data;
-      err = result.error;
-    }
-
-    if (err) {
+  } else if (!chapter) {
+    // Subject only → weighted fetch across chapters
+    const weights = CHAPTER_WEIGHTS[subject];
+    if (!weights) {
       setError(true);
-    } else {
-      const processed = data.map(q => {
-        const optionsMap = { 'A': q.option_a, 'B': q.option_b, 'C': q.option_c, 'D': q.option_d };
-        const correctText = optionsMap[q.correct_answer];
-
-        let options;
-        if (isCEE || isWeekly) {
-          // CEE: keep original option order, no shuffle
-          options = [q.option_a, q.option_b, q.option_c, q.option_d];
-        } else {
-          // Chapter practice: shuffle options
-          options = [q.option_a, q.option_b, q.option_c, q.option_d].sort(() => Math.random() - 0.5);
-        }
-
-        return { ...q, options, correct_answer: correctText };
-      });
-
-      setQuestion(processed);
-      setQuestionStatuses(Array(processed.length).fill('not_visited'));
-      setQuizStarted(true);
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    const promises = Object.entries(weights).map(([chapterName, limit]) =>
+      supabaseClient
+        .from('mcq')
+        .select('*')
+        .eq('Subject', subject)
+        .eq('Chapter', chapterName)
+        .limit(limit * 3) // fetch 3x so we have pool to randomize from
+    );
+
+    const results = await Promise.all(promises);
+    const combined = [];
+
+    results.forEach((res, i) => {
+      if (res.error || !res.data) return;
+      const chapterName = Object.keys(weights)[i];
+      const needed = weights[chapterName];
+      // shuffle and take only what we need
+      const shuffled = res.data.sort(() => Math.random() - 0.5);
+      combined.push(...shuffled.slice(0, needed));
+    });
+
+    // shuffle the final combined array so chapters aren't grouped
+    data = combined.sort(() => Math.random() - 0.5);
+    err = null;
+
+  } else {
+    // Chapter selected (with or without section) → use RPC
+    const result = await supabaseClient.rpc('get_random_questions', {
+      p_subject: subject,
+      p_chapter: chapter,
+      p_section: section || null,
+      p_limit: 50
+    });
+    data = result.data;
+    err = result.error;
   }
 
+  if (err) {
+    setError(true);
+  } else {
+    const processed = data.map(q => {
+      const optionsMap = { 'A': q.option_a, 'B': q.option_b, 'C': q.option_c, 'D': q.option_d };
+      const correctText = optionsMap[q.correct_answer];
+
+      let options;
+      if (isCEE || isWeekly) {
+        options = [q.option_a, q.option_b, q.option_c, q.option_d];
+      } else {
+        options = [q.option_a, q.option_b, q.option_c, q.option_d].sort(() => Math.random() - 0.5);
+      }
+
+      return { ...q, options, correct_answer: correctText };
+    });
+
+    setQuestion(processed);
+    setQuestionStatuses(Array(processed.length).fill('not_visited'));
+    setQuizStarted(true);
+  }
+  setLoading(false);
+}
   useEffect(() => { LoadQuestions(); }, []);
 
   const progress = question.length > 0 ? Math.round((current / question.length) * 100) : 0;

@@ -205,6 +205,37 @@
   line-height: 1.6;
 }
 
+/* Subject Filter */
+.rs-subject-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.rs-subject-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #c8e6c9;
+  background: #f9fdf9;
+  color: #6b8f6b;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rs-subject-btn.active {
+  background: #16A34A;
+  border-color: #16A34A;
+  color: #fff;
+}
+
+.rs-subject-btn:active {
+  transform: scale(0.97);
+}
+
 .rs-explanation strong {
   color: #16A34A;
   display: block;

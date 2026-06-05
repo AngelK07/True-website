@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import supabaseClient from "../../API/supabase";
 import logo from "../assets/logo.png";
@@ -9,9 +9,10 @@ let attemptSaved = false;
 export default function Result() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { username, questions, answers, timeTaken, subject, chapter, section, test_label, test_type } = location.state || {};
+  const { questions, answers, timeTaken, subject, chapter, section, test_label, test_type } = location.state || {};
 
   const [activeTab, setActiveTab] = useState("wrong");
+  const [subjectFilter, setSubjectFilter] = useState("All");
 
   if (!questions) {
     navigate('/');
@@ -36,43 +37,50 @@ export default function Result() {
     }
   });
 
+  const subjects = ["All", ...new Set(questions.map(q => q.Subject))];
+
+  const filteredWrong = subjectFilter === "All" ? wrong : wrong.filter(q => q.Subject === subjectFilter);
+  const filteredSkipped = subjectFilter === "All" ? skipped : skipped.filter(q => q.Subject === subjectFilter);
+  const filteredCorrect = subjectFilter === "All" ? correct : correct.filter(q => q.Subject === subjectFilter);
+
   useEffect(() => {
     if (attemptSaved) return;
     attemptSaved = true;
 
     async function saveAttempt() {
       const { data, error } = await supabaseClient
-      .from('quiz_attempts')
-      .insert({
-        score: score,
-        time_taken: timeTaken,
-        test_type: test_type,
-        test_label: test_label,
-        total: questions.length,
-        subject: subject,
-        chapter: chapter
-      })
-      .select('attempt_id')
-      .single();
+        .from('quiz_attempts')
+        .insert({
+          score: score,
+          time_taken: timeTaken,
+          test_type: test_type,
+          test_label: test_label,
+          total: questions.length,
+          subject: subject,
+          chapter: chapter
+        })
+        .select('attempt_id')
+        .single();
 
-    if (error) { console.error('Attempt save failed:', error); return; }
+      if (error) { console.error('Attempt save failed:', error); return; }
 
-    const attemptId = data.attempt_id;
+      const attemptId = data.attempt_id;
 
-    const answerRows = questions.map((q) => ({
-      attempt_id: attemptId,
-      mcq_id: q.mcq_id,
-      selected: answers[q.mcq_id] || null,
-      is_correct: answers[q.mcq_id] === q.correct_answer,
-      time_taken: null
-    }));
+      const answerRows = questions.map((q) => ({
+        attempt_id: attemptId,
+        mcq_id: q.mcq_id,
+        selected: answers[q.mcq_id] || null,
+        is_correct: answers[q.mcq_id] === q.correct_answer,
+        time_taken: null
+      }));
 
-    const { error: ansError } = await supabaseClient
-      .from('attempt_answers')
-      .insert(answerRows);
+      const { error: ansError } = await supabaseClient
+        .from('attempt_answers')
+        .insert(answerRows);
 
-    if (ansError) console.error('Answers save failed:', ansError);
-  }
+      if (ansError) console.error('Answers save failed:', ansError);
+    }
+
     saveAttempt();
   }, []);
 
@@ -168,48 +176,61 @@ export default function Result() {
       {/* Tabs */}
       <div className="rs-tabs">
         <button className={getTabClass('wrong')} onClick={() => setActiveTab('wrong')}>
-          Wrong ({wrong.length})
+          Wrong ({filteredWrong.length})
         </button>
         <button className={getTabClass('skipped')} onClick={() => setActiveTab('skipped')}>
-          Skipped ({skipped.length})
+          Skipped ({filteredSkipped.length})
         </button>
         <button className={getTabClass('correct')} onClick={() => setActiveTab('correct')}>
-          Correct ({correct.length})
+          Correct ({filteredCorrect.length})
         </button>
+      </div>
+
+      {/* Subject Filter */}
+      <div className="rs-subject-filter">
+        {subjects.map(s => (
+          <button
+            key={s}
+            className={subjectFilter === s ? 'rs-subject-btn active' : 'rs-subject-btn'}
+            onClick={() => setSubjectFilter(s)}
+          >
+            {s}
+          </button>
+        ))}
       </div>
 
       {/* Tab Content */}
       <div>
         {activeTab === 'wrong' && (
-          wrong.length === 0
+          filteredWrong.length === 0
             ? <div className="rs-empty">No wrong answers 🎉</div>
-            : wrong.map((q, i) => <QuestionCard key={i} q={q} type="wrong" />)
+            : filteredWrong.map((q, i) => <QuestionCard key={i} q={q} type="wrong" />)
         )}
         {activeTab === 'skipped' && (
-          skipped.length === 0
+          filteredSkipped.length === 0
             ? <div className="rs-empty">No skipped questions 🎉</div>
-            : skipped.map((q, i) => <QuestionCard key={i} q={q} type="skipped" />)
+            : filteredSkipped.map((q, i) => <QuestionCard key={i} q={q} type="skipped" />)
         )}
         {activeTab === 'correct' && (
-          correct.length === 0
+          filteredCorrect.length === 0
             ? <div className="rs-empty">No correct answers yet</div>
-            : correct.map((q, i) => <QuestionCard key={i} q={q} type="correct" />)
+            : filteredCorrect.map((q, i) => <QuestionCard key={i} q={q} type="correct" />)
         )}
       </div>
 
       {/* Action Buttons */}
       <div className="rs-actions">
         <button
-  className="rs-btn-retake"
-  onClick={() => {
-    attemptSaved = false; // reset so next attempt saves too
-    navigate('/Quiz', {
-      state: { subject, chapter, section, test_label}
-    });
-  }}
->
-  Retake
-</button>
+          className="rs-btn-retake"
+          onClick={() => {
+            attemptSaved = false;
+            navigate('/Quiz', {
+              state: { subject, chapter, section, test_label }
+            });
+          }}
+        >
+          Retake
+        </button>
         <button
           className="rs-btn-back"
           onClick={() => navigate('/QuizSelection')}
