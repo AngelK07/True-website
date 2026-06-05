@@ -13,6 +13,7 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 8px;
+  gap: 8px;
 }
 
 .qs-logout-btn {
@@ -27,6 +28,22 @@
 }
 
 .qs-logout-btn:hover {
+  border-color: #16A34A;
+  color: #16A34A;
+}
+
+.qs-history-btn {
+  background: transparent;
+  border: 1.5px solid #c8e6c9;
+  color: #4a7a4a;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+}
+
+.qs-history-btn:hover {
   border-color: #16A34A;
   color: #16A34A;
 }

@@ -57,7 +57,8 @@ export default function Result() {
           test_label: test_label,
           total: questions.length,
           subject: subject,
-          chapter: chapter
+          chapter: chapter,
+          section: section
         })
         .select('attempt_id')
         .single();
@@ -142,8 +143,16 @@ export default function Result() {
 
       {/* Header */}
       <div className="rs-header">
-        <img src={logo} alt="HCM" className="rs-logo" />
-        <div className="rs-logo-name">HCM</div>
+        <div className="rs-header-logo">
+          <img src={logo} alt="HCM" className="rs-logo" />
+          <div className="rs-logo-name">HCM</div>
+        </div>
+          <button
+      className="qs-history-btn"
+      onClick={() => navigate('/history')}
+    >
+      History
+    </button>
       </div>
 
       {/* Score Card */}
