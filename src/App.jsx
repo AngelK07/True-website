@@ -8,7 +8,6 @@ import QuizSelection from './pages/QuizSelction'
 import QuizLogic from './pages/Quiz'
 import Result from './pages/result'
 import Payment from './pages/payment'  // adjust path if needed
-import History from './pages/History'  // adjust path if needed
 function App() {
   return (
     <AuthProvider>
@@ -34,11 +33,6 @@ function App() {
           }/>
           <Route path="/payment" element={
               <Payment/>
-          }/>
-          <Route path="/history" element={
-            <ProtectedRoute>
-              <History/>
-            </ProtectedRoute>
           }/>
         </Routes>
       </BrowserRouter>

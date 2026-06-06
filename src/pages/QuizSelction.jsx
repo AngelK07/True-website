@@ -136,9 +136,6 @@ useEffect(() =>  {
         <button type="button" className="qs-logout-btn" onClick={onLogout}>
           Logout
         </button>
-        <button type="button" className="qs-history-btn" onClick={() => navigate('/history')}>
-          History
-        </button>
       </div>
 
       {/* Logo */}
