@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate,useLocation } from "react-router-dom"
 import { useAuth } from "../../context/authProvider"
 import logo from "../assets/logo.png"
 import '../Css/QuizSelection.css'
@@ -7,6 +7,7 @@ import supabaseClient from "../../API/supabase"
 
 export default function QuizSelection() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { handleLogout } = useAuth()
   const [username, setUsername] = useState('')
   const [subject, setSubject] = useState('')
@@ -78,6 +79,25 @@ export default function QuizSelection() {
   const chapters = subject ? Object.keys(syllabus[subject]) : []
   const sections = chapter ? syllabus[subject][chapter] : []
 
+useEffect(() => {
+  if (location.state?.test_type) {
+    const s = location.state;
+    if (s.test_type === 'chapter') {
+      setMode('chapter');
+      if (s.subject) setSubject(s.subject);
+      if (s.chapter) setChapter(s.chapter);
+      if (s.section) setSection(s.section);
+    } else if (s.test_type === 'weekly') {
+      setMode('weekly');
+      setSelWeek(s.test_label || null);
+    } else if (s.test_type === 'CEE') {
+      setMode('cee');
+      setSelCee(s.test_label || null);
+    }
+  }
+}, []);
+
+
 useEffect(() =>  {
   if(mode === 'weekly') fetchlabels('weekly',setWeeklabels)
   if (mode === 'cee') fetchlabels('CEE',setCeelabels)
@@ -133,10 +153,13 @@ useEffect(() =>  {
     <div className="qs-wrap">
 
       <div className="qs-top">
-        <button type="button" className="qs-logout-btn" onClick={onLogout}>
-          Logout
-        </button>
-      </div>
+  <button type="button" className="qs-history-btn" onClick={() => navigate('/history')}>
+    History
+  </button>
+  <button type="button" className="qs-logout-btn" onClick={onLogout}>
+    Logout
+  </button>
+</div>
 
       {/* Logo */}
       <div className="qs-logo-area">
