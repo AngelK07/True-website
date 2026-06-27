@@ -176,11 +176,13 @@ export default function History() {
   }
 
   function handleReview(attempt) {
+    console.log('reviewing attempt_id:', attempt.attempt_id);
     navigate('/result', {
       state: {
         attemptId: attempt.attempt_id,
         reviewMode: true,
       },
+      
     });
   }
 
